@@ -164,15 +164,21 @@ The model mapping table in the Java code suggests a family of hubs and valve con
 
 These values likely define device families and capabilities such as number of valves and whether a rain sensor exists.
 
-## Unknowns and TODOs
+## Current implementation decisions
 
-The following points remain uncertain and should not be guessed in implementation:
+The reverse-engineered Android code gives enough signal to implement the transport conservatively without guessing every payload schema:
 
-- TODO: Determine the exact line framing of successful and failed responses.
-- TODO: Confirm whether each command requires a specific initial handshake sequence beyond READY.
-- TODO: Confirm the exact payload schema for status and firmware responses.
-- TODO: Confirm whether the PIN is always required or only for some commands.
-- TODO: Determine whether the hub returns structured data or only compact semicolon-delimited strings.
-- TODO: Confirm how the cloud relay flow (PUTJOB / PUSH_CHECKJOB) differs from local TCP/SSL flow.
-- TODO: Confirm the precise meaning of the status byte returned in the irrigation response.
-- TODO: Confirm how the number of valves and their names are discovered dynamically from the hub.
+- The transport is line-based over TLS 1.2. The client connects to the hub, waits for a READY line, sends the command as ASCII text, and reads until OK, ERR, or INVALIDPIN.
+- The raw payload text before the final OK is preserved as the response payload. This is the safest interpretation of the Java flow and keeps the implementation future-proof.
+- The PIN is treated as an optional suffix to the command line, matching the observed behavior where the Android client appends a PIN when available.
+- Manual irrigation commands use hexadecimal values for durations expressed in tenths of seconds. Sequential irrigation uses one duration field per valve, while simultaneous irrigation uses a shared duration plus a valve-selection mask.
+- The current integration uses the generic status fields needed for the coordinator: connection state, firmware version, irrigation state, and default duration. The exact semantics of every status byte and model-specific payload remain device dependent and are therefore parsed conservatively.
+- The local hub defaults remain the values observed in the Java constants: 10.0.0.1:9000. The cloud relay flow uses the observed relay endpoint 138.201.247.169:9001 but is not fully implemented in this repository yet.
+
+### Remaining uncertainties
+
+Some details are still intentionally left as protocol assumptions rather than hard facts:
+
+- The exact payload schema for every command family is device-specific and may vary by firmware revision.
+- The precise meaning of every status byte returned by the hub should be validated against a real device or a captured session.
+- The exact valve discovery flow and the full cloud-relay sequence require a real-world trace before they can be implemented as strict parsers.
