@@ -5,6 +5,8 @@ config/*
 # Custom components (HACS-installed dependencies and dev symlinks)
 custom_components/*
 !custom_components/ha_integration_domain/
+!custom_components/samcla/
+!custom_components/samcla/**
 
 # Development tool caches and dependency locks
 .ruff_cache/
@@ -19,6 +21,7 @@ node_modules/
 
 # AI agent temporary scratch files and planning notes
 .ai-scratch/
+.context/
 
 # Runtime artifact created by the template-sync workflow (never commit)
 .templatesyncignore.runtime

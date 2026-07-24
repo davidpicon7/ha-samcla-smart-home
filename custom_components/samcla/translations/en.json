@@ -1,0 +1,15 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to your SAMCLA hub",
+        "description": "Enter the network details of the irrigation hub.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "pin": "PIN"
+        }
+      }
+    }
+  }
+}
