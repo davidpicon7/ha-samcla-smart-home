@@ -13,3 +13,7 @@ class SamclaConnectionError(SamclaError):
 
 class SamclaAuthError(SamclaError):
     """Raised when the Hub PIN is rejected."""
+
+
+class SamclaCommandError(SamclaError):
+    """Raised when the hub rejects or fails a command."""
